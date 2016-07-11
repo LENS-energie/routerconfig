@@ -11,6 +11,14 @@
 #
 # By default this script does nothing.
 
-nvidia-smi -pm 1	# Put GPU driver into persistent mode to prevent logout problems
+# Print the IP address
+_IP=$(hostname -I) || true
+if [ "$_IP" ]; then
+  printf "My IP address is %s\n" "$_IP"
+fi
+
+. /etc/rc.ufw
+
+/usr/local/bin/start-ssh-tunnel.sh &
 
 exit 0

@@ -1,0 +1,33 @@
+auto lo
+
+iface lo inet loopback
+
+# By default, eth0 is set up to acquire its settings over DHCP
+#iface eth0 inet dhcp
+
+# Uncomment this if we're running as a router, with a DHCP-server on eth0
+allow-hotplug eth0
+iface eth0 inet static
+address 192.168.42.1
+netmask 255.255.255.0
+network 192.168.42.0
+broadcast 192.168.42.255
+#gateway 192.168.42.1
+
+
+# eth1 is a Huawei HiLink dongle, or another USB networking device. 
+# The dongle allocates us an IP addr on this port
+allow-hotplug eth1
+iface eth1 inet dhcp
+
+
+# Uncomment to enable IP-masquerading and routing on eth1 or ppp0
+up iptables-restore < /etc/iptables.masq.ipv4.nat
+
+
+allow-hotplug wlan0
+iface wlan0 inet manual
+wpa-roam /etc/wpa_supplicant/wpa_supplicant.conf
+#iface default inet dhcp
+
+
