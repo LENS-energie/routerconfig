@@ -1,6 +1,6 @@
 # Cellular router
 
-These files contain the basic configuration used to turn a Raspberry Pi running [Minibian](https://minibianpi.wordpress.com) or [DietPi](http://dietpi.com/) into a cellular (GPRS/3G/4G) router. Our current setup uses a Huawei E303 HSPA USB Stick. Parts of this configuration were based on ((http://techmind.org/rpi/)).
+These files contain the basic configuration used to turn a Raspberry Pi running [Minibian](https://minibianpi.wordpress.com) or [DietPi](http://dietpi.com/) into a cellular (GPRS/3G/4G) router. Our current setup uses a Huawei E303 HSPA USB Stick. Parts of this configuration were based on <http://techmind.org/rpi/>.
 
 After a fresh install of Minibian or Dietpi, install the files from this repository and perform the following steps:
 
