@@ -15,16 +15,16 @@ apt-get update
 apt-get upgrade
 apt-get dist-upgrade
 
-# Install packages (the last two are optional)
-apt-get install dnsmasq autossh ufw sg3-utils openssh-server logrotate vnstat joe git
+# Install packages
+apt-get install dnsmasq autossh ufw sg3-utils openssh-server logrotate vnstat git
 
 # Clean up
 apt-get clean
 
 # Create TFTP-directory
+mkdir /var/ftpd
 
 # Install log2ram
-mkdir /var/ftpd
 cd /root
 git clone https://github.com/azlux/log2ram.git
 cd /root/log2ram
@@ -42,7 +42,35 @@ The default configuration is as follows:
  - The script `/usr/local/bin/start-ssh-tunnel.sh` is run on boot, to set up a reverse SSH-tunnel (optional, and requires ssh-copy-id to the server)
  - vnstat can be used to check network traffic stats
 
-Example /usr/local/bin/start-ssh-tunnel.sh:
+
+### Analysis tools
+
+Before rebooting, you may want to install some additional analysis tools, in case you run into problems:
+ - `apt-get install traceroute bind9-host usbutils` will give you the commands `traceroute`, `host` and `lsusb`.
+ - `apt-get install bmon tcptrack iptraf` will allow you to analyse network traffic in more detail.
+
+
+### Cloning your SD-card
+
+Once you have installed and tested the router, you can make an image of the SD-card for easy cloning. However, recent versions of Debian (including Raspbian) include a feature called [predictable network interface names](https://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames/), which will interfere with cloning if not disabled. The problem is that the system remembers the MAC-address of your network interfaces (which are unique for every device), and assigns a new network device to each new MAC. However, the configuration files above expect the LAN (UTP-device) to be eth0 and the WAN (modem, etc.) to be eth1. There are at least three ways around this:
+
+1. Hand-edit the rules file (usually `80-net-setup-link.rules`) in `/etc/udev/rules.d/` for every new device, so that eth0 and eth1 are assigned correctly.
+2. Remove the rules file (or at least the entries in the file) before making an image of the SD-card. Upon first boot on new hardware, new rules will be created (and can be modified if needed).
+3. Disable predictable network interface names alltogether by linking the rules-file to `/dev/null`. In this case you need to trust the kernel to assign network device names correctly (which is usually not a problem, as the built-in UTP-device is generally detected first and assigned eth0).
+
+To make an image of the SD-card on a Linux-system and copy it to a new SD-card, perform the following steps:
+
+1. Insert the card in a card-reader. If it is auto-mounted, run `mount` in a terminal to find out the device names of the boot- and root-partions on the card (e.g. `/dev/sdb1` and `/dev/sdb2`). If it is not auto-mounted (e.g. in Ubuntu server or Raspbian), run `dmesg` to find out the device name of the card (e.g. `/dev/sdb`).
+2. If the partitions have been auto-mounted, unmount them in the terminal (e.g. `sudo umount /dev/sdb1 ; sudo umount /dev/sdb2`).
+3. Use `dd` or `dcfldd` to copy the SD-card device to a file (e.g. `sudo dd if=/dev/sdb of=minibian-gprsrouter.img`).
+4. Remove the SD-card and insert an empty SD-card. Double-check that you are using the correct device name (important to avoid overwriting your entire harddisk!!) and copy the image to the new card (e.g. `sudo dd if=minibian-gprsrouter.img of=/dev/sdb`).
+
+If you want to check or modify the image directly, you can mount its boot- and root-partition using `kpartx` (e.g. `sudo kpartx -v -a minibian-gprsrouter.img`).
+
+
+### Setting up a reverse SSH-tunnel for remote access
+
+Example `/usr/local/bin/start-ssh-tunnel.sh`:
 
 ```
 #!/bin/sh
@@ -62,8 +90,8 @@ until $(eval $test_network); do
     sleep 30
 done
 
-# Setup a reverse tunnel using autossh
-autossh -f -nNT -R $remote_server:$remote_port:localhost:22 $remote_user@$remote_server
+# Setup a reverse tunnel with compression using autossh
+autossh -f -nNTC -R $remote_server:$remote_port:localhost:22 $remote_user@$remote_server
 
 # Don't forget to push your local SSH-key to the remote server before running this script, e.g.:
 # ssh-copy-id remoteuser@ssh.mydomain.com
