@@ -81,7 +81,7 @@ Example `/usr/local/bin/start-ssh-tunnel.sh`:
 
 remote_server=ssh.mydomain.com
 remote_user=remoteuser
-remote_port=2200
+remote_port_ssh=2200
 
 test_network="ping -q -c2 google.com >/dev/null"
 
@@ -91,7 +91,7 @@ until $(eval $test_network); do
 done
 
 # Setup a reverse tunnel with compression using autossh
-autossh -f -nNTC -R $remote_server:$remote_port:localhost:22 $remote_user@$remote_server
+autossh -f -nNTC -R $remote_server:$remote_port_ssh:localhost:22 $remote_user@$remote_server
 
 # Don't forget to push your local SSH-key to the remote server before running this script, e.g.:
 # ssh-copy-id remoteuser@ssh.mydomain.com
