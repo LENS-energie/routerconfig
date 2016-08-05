@@ -54,7 +54,7 @@ Before rebooting, you may want to install some additional analysis tools, in cas
 
 Once you have installed and tested the router, you can make an image of the SD-card for easy cloning. However, recent versions of Debian (including Raspbian) include a feature called [predictable network interface names](https://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames/), which will interfere with cloning if not disabled. The problem is that the system remembers the MAC-address of your network interfaces (which are unique for every device), and assigns a new network device to each new MAC. However, the configuration files above expect the LAN (UTP-device) to be eth0 and the WAN (modem, etc.) to be eth1. There are at least three ways around this:
 
-1. Hand-edit the rules file (usually `80-net-setup-link.rules`) in `/etc/udev/rules.d/` for every new device, so that eth0 and eth1 are assigned correctly.
+1. Hand-edit the rules file (usually `70-persistent-net.rules` or `80-net-setup-link.rules`) in `/etc/udev/rules.d/` for every new device, so that eth0 and eth1 are assigned correctly.
 2. Remove the rules file (or at least the entries in the file) before making an image of the SD-card. Upon first boot on new hardware, new rules will be created (and can be modified if needed).
 3. Disable predictable network interface names alltogether by linking the rules-file to `/dev/null`. In this case you need to trust the kernel to assign network device names correctly (which is usually not a problem, as the built-in UTP-device is generally detected first and assigned eth0).
 
