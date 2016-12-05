@@ -42,6 +42,16 @@ The default configuration is as follows:
  - The script `/usr/local/bin/start-ssh-tunnel.sh` is run on boot, to set up a reverse SSH-tunnel (optional, and requires ssh-copy-id to the server)
  - vnstat can be used to check network traffic stats
 
+### Modems and mode-switching
+
+If you use a "HiLink" USB-modem such as the Huawei E303 or E3256, you will need to set the APN of your SIM-provider using the configuration page of the modem. You can probably do this on a Windows-computer using the drivers provided by Huawei, or on a Linux-computer by mode-switching the device and pointing your web-browser to the IP-address of the modem (e.g. http://192.168.1.1 or http://192.168.8.1). Mode-switching is needed to tell the USB-modem it should behave as a modem rather than pretending it's a CD-ROM with Windows-drivers. Unfortunately the process is somewhat device-dependent. If you install `sg3-utils`, the following works for some Huawei-modems: 
+
+```
+sudo /usr/bin/sg_raw /dev/sr0 11 06 20 00 00 00 00 00 01 00
+```
+
+The configuration in this repository already has a udev-file that will automatically mode-switch such Huawei USB-modems. For other modems, it's probably a good idea to use the [usb_modeswitch](http://www.draisberghof.de/usb_modeswitch/)-tool.
+
 
 ### Analysis tools
 
